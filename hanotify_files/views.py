@@ -24,6 +24,7 @@ def make_store_directory(request):
                     text_id=text_id
                 )
                 os.makedirs(store_path, exist_ok=True)
+                os.makedirs(f'{store_path}/categories', exist_ok=True)
                 return JsonResponse({'Detail': 'Path created'}, status=200)
             except Exception as e:
                 print(e)
@@ -120,12 +121,21 @@ def make_user_directory(request):
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
             try:
                 user_id = request.POST.get('user_id')
-                store_id = request.POST.get('store_id')
+                store = json.loads(request.POST.get('store'))
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/products')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}/categories')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/categories')
+                
+                Store.objects.create(
+                    id=store['id'],
+                    user_id=user_id,
+                    text_id=store['id'],
+                )
+                with open(settings.BASE_DIR / f'json/users/stores/{store["id"]}.json', 'w') as json_file:
+                    json.dump(store, json_file)
+
                 return JsonResponse({'detail': 'Path created'}, status=200)
             except Exception as e:
                 print(e)
