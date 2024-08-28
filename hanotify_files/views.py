@@ -9,10 +9,22 @@ from PIL import Image as IM
 from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo
 from django.http import FileResponse
 
+from urllib.parse import urlparse
+
+def extract_domain(url):
+    # Parse the URL
+    parsed_url = urlparse(url)
+
+    # Extract the domain (netloc)
+    domain = parsed_url.netloc
+
+    return domain
+
 # delete user and delete category
 def render_store(request, path=None):
-    domain = request.get_host()
-    print(domain)
+    absolute_uri = request.build_absolute_uri()
+    domain = extract_domain(absolute_uri)
+    print('domain:               ', domain)
     with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
         return render(request, 'index.html', context={
             'store': json.dumps(json.load(json_file))
