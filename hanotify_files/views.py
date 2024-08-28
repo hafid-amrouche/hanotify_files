@@ -12,6 +12,7 @@ from django.http import FileResponse
 # delete user and delete category
 def render_store(request, path=None):
     domain = request.get_host()
+    print(domain)
     with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
         return render(request, 'index.html', context={
             'store': json.dumps(json.load(json_file))
