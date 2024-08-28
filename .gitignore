@@ -26,7 +26,8 @@ dist/
 *.pyd
 *.sqlite3
 db.sqlite3
-media
+/media
+/build
 local_settings.py
 constants.py
 hanotify_files/settings.py
