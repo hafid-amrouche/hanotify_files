@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 import os, shutil, json
 from django.conf import settings
 from constants import media_files_domain
@@ -9,6 +10,26 @@ from files_management.models import ProductImage, Product, Store, Category, Cete
 from django.http import FileResponse
 
 # delete user and delete category
+def render_store(request, path=None):
+    domain = request.get_host()
+    with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
+        return render(request, 'index.html', context={
+            'store': json.dumps(json.load(json_file))
+        })
+    
+def render_product(request, slug, product_id, path=None):
+    domain = request.get_host()
+    with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
+        store = json.load(json_file)
+    
+    product_id = product_id
+    with open(settings.BASE_DIR / f'json/users/products/{product_id}.json', 'r') as json_file:
+        product = json.load(json_file)
+    
+    return render(request, 'index.html', context={
+        'store': json.dumps(store),
+        'product': json.dumps(product)
+    })
 
 def make_store_directory(request):
     if request.method == 'POST' :
@@ -16,12 +37,12 @@ def make_store_directory(request):
             try:
                 store_id = request.POST.get('store_id')
                 user_id = request.POST.get('user_id')
-                text_id = request.POST.get('text_id')
-                store_path = f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}'
+                domain = request.POST.get('domain')
+                store_path = f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{domain}'
                 Store.objects.create(
                     id=store_id,
                     user_id=user_id,
-                    text_id=text_id
+                    domain=domain
                 )
                 os.makedirs(store_path, exist_ok=True)
                 os.makedirs(f'{store_path}/categories', exist_ok=True)
@@ -102,6 +123,9 @@ def delete_product(request):
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
                 print(e)
+            print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+            return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
+        return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
 
 def toggle_product_state(request):
     if request.method == 'POST' :
@@ -131,9 +155,9 @@ def make_user_directory(request):
                 Store.objects.create(
                     id=store['id'],
                     user_id=user_id,
-                    text_id=store['id'],
+                    domain=store['domain'],
                 )
-                with open(settings.BASE_DIR / f'json/users/stores/{store["id"]}.json', 'w') as json_file:
+                with open(settings.BASE_DIR / f'json/users/stores/{store["domain"]}.json', 'w') as json_file:
                     json.dump(store, json_file)
 
                 return JsonResponse({'detail': 'Path created'}, status=200)
@@ -530,11 +554,11 @@ def toggle_store_state(request):
             
 def get_store(request):
     data = request.GET
-    text_id = data.get('id')
-    store = Store.objects.get(text_id = text_id)
+    domain = data.get('id')
+    store = Store.objects.get(domain = domain)
 
     if store.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.id}.json', 'rb'))
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
         return response
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)

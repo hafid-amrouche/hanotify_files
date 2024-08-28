@@ -5,7 +5,7 @@ import os
 class Store(models.Model):
     user_id =  models.BigIntegerField()
     id = models.PositiveBigIntegerField(primary_key=True)
-    text_id = models.TextField(null=True, blank=True)
+    domain = models.TextField(null=True, blank=True)
     active = models.BooleanField(default=True)
     image_url = models.TextField(null=True, blank=True)
     image_path = models.TextField(null=True, blank=True)
@@ -29,7 +29,7 @@ pre_delete.connect(store_image_pre_delete, StoreLogo)
 
 class Product(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
-    user_id = models.PositiveBigIntegerField()
+    user_id = models.PositiveBigIntegerField(null=True, blank=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE, null=True, blank=True)
     active = models.BooleanField(default=True)
 
