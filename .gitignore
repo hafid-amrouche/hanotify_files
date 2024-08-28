@@ -16,7 +16,6 @@ venv.bak/
 *.egg
 *.egg-info/
 dist/
-build/
 *.whl
 
 # Django stuff:
