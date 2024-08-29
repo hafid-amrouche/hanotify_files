@@ -171,7 +171,7 @@ def upload_variant_image(request):
                 )
                 image_extention = f'users/{user_id}/stores/{store_id}/products/{product_id}/{image_object.id}.webp'     
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
-                image_path = os.path.join(settings.MEDIA_ROOT, image_extention.replace('/', '\\'))
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
                 image_pil.save(image_path)
                 image_size = os.path.getsize(image_path) / 1024
                 image_object.url = image_url
@@ -216,7 +216,7 @@ def upload_rich_text_image(request):
                 )
                 image_extention = f'users/{user_id}/stores/{store_id}/products/{product_id}/{image_object.id}.webp'     
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
-                image_path = os.path.join(settings.MEDIA_ROOT, image_extention.replace('/', '\\'))
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
                 image_pil.save(image_path)
                 image_size = os.path.getsize(image_path) / 1024
                 image_object.url = image_url
@@ -261,7 +261,7 @@ def upload_gellery_image(request):
                 )
                 image_extention = f'users/{user_id}/stores/{store_id}/products/{product_id}/{image_object.id}.webp'     
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
-                image_path = os.path.join(settings.MEDIA_ROOT, image_extention.replace('/', '\\'))
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
                 image_pil.save(image_path)
                 image_size = os.path.getsize(image_path) / 1024
                 image_object.url = image_url
@@ -299,7 +299,7 @@ def upload_category_image(request):
                 catgory_image = CetegoryImage.objects.create(store=store)
                 image_extention = f'users/{user_id}/stores/{ store_id }/categories/{catgory_image.id}.webp'     
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
-                image_path = os.path.join(settings.MEDIA_ROOT, image_extention.replace('/', '\\'))
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
                 image_pil.save(image_path)
                 image_size = os.path.getsize(image_path) / 1024
                 catgory_image.url = image_url
