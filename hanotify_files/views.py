@@ -126,11 +126,10 @@ def make_user_directory(request):
                 user_id = request.POST.get('user_id')
                 store = json.loads(request.POST.get('store'))
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/products')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/categories')
-                
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/products')
                 Store.objects.create(
                     id=store['id'],
                     user_id=user_id,
@@ -498,22 +497,37 @@ def get_product_for_edit(request):
     
 def save_store(request):
     data = request.POST
-    store_data = json.loads(data.get('store_data'))
     MESSAGING_KEY = data.get('MESSAGING_KEY')
     if MESSAGING_KEY != settings.MESSAGING_KEY:
         return JsonResponse({'detail': "Wrong credintials"}, status=400)
-    
-    store_id = data.get('store_id')
-    store_logo_url = data.get('store_logo_url')
+        
+    store_id = data.get('id')
     store = Store.objects.get(id=store_id)
-    store_logo = StoreLogo.objects.get(url = store_logo_url)
-    try:
-        store.logo.delete()
-    except:
-        pass
-    store_logo.store = store
-    store_logo.save()
-    with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'w') as json_file:
+    store_data = json.loads(data.get('store'))
+    print(store_data)
+    logo = store_data.get('logo')
+    if logo:
+        try:
+            if (store.logo and (store.logo.url != logo)):
+                store.logo.delete()
+            store_logo = StoreLogo.objects.get(url = logo)
+            store_logo.store = store
+            store_logo.save()
+        except:
+            try:
+                store.logo.delete()
+            except:
+                pass
+            store_data['logo'] = None
+            print('Error: ' + 'save_store 519')
+            pass
+    else:
+        try:
+            store.logo.delete()
+        except:
+            pass
+   
+    with open(settings.BASE_DIR / f'json/users/stores/{store.domain}.json', 'w') as json_file:
         json.dump(store_data, json_file)
 
     return JsonResponse({'detail' : 'success'}, status=200)
