@@ -329,7 +329,8 @@ def upload_store_logo(request):
                 store_logo = StoreLogo.objects.create()                
                 image_extention = f'users/{user_id}/stores/{store_id}/{store_logo.id}.{image_pil.format.lower()}'     
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
-                image_path = os.path.join(settings.MEDIA_ROOT, image_extention.replace('/', '\\'))
+                image_path = os.path.join(settings.MEDIA_ROOT, image_extention)
+                image_path = image_path.replace('\\', '/')
                 image_pil.save(image_path)
                 
                 store_logo.url = image_url
