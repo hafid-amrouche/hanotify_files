@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path
 from . import views
 from django.conf.urls.static import static
 from django.conf import settings
@@ -23,11 +23,6 @@ from django.conf import settings
 
 
 urlpatterns = [
-    ## Store urls
-    path('', views.render_store),
-    path('products/<slug>/<product_id>', views.render_product),
-    re_path(r'^categories/(?P<path>.*)$', views.render_store),
-    
     ## files urls
     path('files/admin/', admin.site.urls),
     path('files/upload-rich-text-image', views.upload_rich_text_image ),
