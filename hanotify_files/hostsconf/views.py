@@ -18,7 +18,7 @@ def extract_domain(url):
 def render_store(request, path=None):
     absolute_uri = request.build_absolute_uri()
     domain = extract_domain(absolute_uri)
-    print('domain:               ', domain)
+    print('domainzone:               ', domain)
     try:
         with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
             return render(request, 'index.html', context={
