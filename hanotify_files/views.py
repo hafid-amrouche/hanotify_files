@@ -318,7 +318,7 @@ def upload_store_logo(request):
     if request.method == 'POST' :
         if user_id:
             store_id = request.POST.get('store_id')
-            store = Store.objects.get(id=store_id, user_id=user_id)
+            Store.objects.get(id=store_id, user_id=user_id)
             image = request.FILES.get('image')
             if image:
                 image_pil = IM.open(image)
@@ -506,12 +506,13 @@ def save_store(request):
     store_data = json.loads(data.get('store'))
     logo = store_data.get('logo')
     if logo:
-        if (store.logo and (store.logo.url != logo)):
-            store.logo.delete()
-            store_logo = StoreLogo.objects.get(url = logo)
-            store_logo.store = store
-            store_logo.save()
-        elif not store.logo :
+        try:
+            if (store.logo.url != logo):
+                store.logo.delete()
+                store_logo = StoreLogo.objects.get(url = logo)
+                store_logo.store = store
+                store_logo.save()
+        except:
             store_logo = StoreLogo.objects.get(url = logo)
             store_logo.store = store
             store_logo.save()  
