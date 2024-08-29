@@ -504,23 +504,17 @@ def save_store(request):
     store_id = data.get('id')
     store = Store.objects.get(id=store_id)
     store_data = json.loads(data.get('store'))
-    print(store_data)
     logo = store_data.get('logo')
     if logo:
-        try:
-            if (store.logo and (store.logo.url != logo)):
-                store.logo.delete()
+        if (store.logo and (store.logo.url != logo)):
+            store.logo.delete()
             store_logo = StoreLogo.objects.get(url = logo)
             store_logo.store = store
             store_logo.save()
-        except:
-            try:
-                store.logo.delete()
-            except:
-                pass
-            store_data['logo'] = None
-            print('Error: ' + 'save_store 519')
-            pass
+        elif not store.logo :
+            store_logo = StoreLogo.objects.get(url = logo)
+            store_logo.store = store
+            store_logo.save()  
     else:
         try:
             store.logo.delete()
