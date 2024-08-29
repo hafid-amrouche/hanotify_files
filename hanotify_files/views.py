@@ -147,7 +147,7 @@ def make_user_directory(request):
 def upload_variant_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_id:
             product_id = request.POST.get('product_id')
@@ -192,7 +192,7 @@ def upload_variant_image(request):
 def upload_rich_text_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_id:
             product_id = request.POST.get('product_id')
@@ -237,7 +237,7 @@ def upload_rich_text_image(request):
 def upload_gellery_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_id:
             product_id = request.POST.get('product_id')
@@ -282,7 +282,7 @@ def upload_gellery_image(request):
 def upload_category_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_id:
             store_id = request.POST.get('store_id')
@@ -314,7 +314,7 @@ def upload_category_image(request):
 def upload_store_logo(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_id:
             store_id = request.POST.get('store_id')
@@ -349,7 +349,7 @@ def delete_all_gallery_images(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
     data = json.loads(request.body)
-    sleep(1)
+    
     if request.method == 'POST' :
         if user_data:
             product_id = data.get('product_id')
@@ -368,7 +368,7 @@ def delete_all_gallery_images(request):
 def delete_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    sleep(1)
+    
     if request.method == 'POST' :
         data =  json.loads(request.body)
         image_url = data.get('image')
