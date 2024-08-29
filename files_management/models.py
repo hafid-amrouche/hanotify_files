@@ -7,8 +7,6 @@ class Store(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
     domain = models.TextField(null=True, blank=True)
     active = models.BooleanField(default=True)
-    image_url = models.TextField(null=True, blank=True)
-    image_path = models.TextField(null=True, blank=True)
 
 class StoreLogo(models.Model): # remove logos with store = None after 24 hours
     store = models.OneToOneField(Store, on_delete=models.CASCADE, null=True, blank=True, related_name='logo')
