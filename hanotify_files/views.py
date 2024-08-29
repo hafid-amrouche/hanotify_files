@@ -548,7 +548,7 @@ def get_store_for_edit(request):
     store_id = request.GET.get('store_id')
     store = Store.objects.get(id=store_id, user_id=user_id)
     try:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.id}.json', 'rb'))
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
         return response
     except:
         return JsonResponse({'detail': 'File not found'}, status=400)
