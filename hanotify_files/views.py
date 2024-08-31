@@ -589,9 +589,9 @@ def delete_fb_pixel(request):
     if MESSAGING_KEY != settings.MESSAGING_KEY:
         return JsonResponse({'detail': "Wrong credintials"}, status=400)
     
-    store_id = data.get('store_id')
+    store_domain = data.get('store_domain')
     
-    file_path = settings.BASE_DIR / f'json/users/stores/{store_id}.json'
+    file_path = settings.BASE_DIR / f'json/users/stores/{store_domain}.json'
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
 
