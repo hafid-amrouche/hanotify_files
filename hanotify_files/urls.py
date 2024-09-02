@@ -24,6 +24,7 @@ from django.conf import settings
 
 urlpatterns = [
     ## files urls
+    path('', views.home),
     path('admin/', admin.site.urls),
     path('upload-rich-text-image', views.upload_rich_text_image ),
     path('upload-variant-image', views.upload_variant_image ),

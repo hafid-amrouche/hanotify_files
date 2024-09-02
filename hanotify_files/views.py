@@ -9,6 +9,8 @@ from PIL import Image as IM
 from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo
 from django.http import FileResponse
 
+def home(request):
+    return JsonResponse({'detail': 'home'})
 
 def make_store_directory(request):
     if request.method == 'POST' :
