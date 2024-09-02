@@ -10,7 +10,8 @@ from files_management.models import ProductImage, Product, Store, Category, Cete
 from django.http import FileResponse
 
 def home(request):
-    return JsonResponse({'detail': 'home'})
+    absolute_uri = request.build_absolute_uri()
+    return JsonResponse({'detail': absolute_uri})
 
 def make_store_directory(request):
     if request.method == 'POST' :
