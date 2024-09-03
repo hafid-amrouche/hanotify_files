@@ -11,6 +11,33 @@ def home(request):
     absolute_uri = request.build_absolute_uri()
     return JsonResponse({'API HOME': absolute_uri})
 
+def make_user_directory(request):
+    if request.method == 'POST' :
+        if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
+            return JsonResponse({'detail': 'Path created'}, status=200)
+            try:
+                user_id = request.POST.get('user_id')
+                store = json.loads(request.POST.get('store'))
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/categories')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/products')
+                Store.objects.create(
+                    id=store['id'],
+                    user_id=user_id,
+                    domain=store['domain'],
+                )
+                with open(settings.BASE_DIR / f'json/users/stores/{store["domain"]}.json', 'w') as json_file:
+                    json.dump(store, json_file)
+
+                return JsonResponse({'detail': 'Path created'}, status=200)
+            except Exception as e:
+                print(e)
+                
+    return JsonResponse({'error': 'Request refused'}, status=405)
+    
+
 def make_store_directory(request):
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
@@ -121,31 +148,6 @@ def toggle_product_state(request):
                 print(e)
                 return JsonResponse({'Detail': 'Product deleted unsuccessfully'}, status=400)
 
-def make_user_directory(request):
-    if request.method == 'POST' :
-        if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
-            try:
-                user_id = request.POST.get('user_id')
-                store = json.loads(request.POST.get('store'))
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/categories')
-                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/products')
-                Store.objects.create(
-                    id=store['id'],
-                    user_id=user_id,
-                    domain=store['domain'],
-                )
-                with open(settings.BASE_DIR / f'json/users/stores/{store["domain"]}.json', 'w') as json_file:
-                    json.dump(store, json_file)
-
-                return JsonResponse({'detail': 'Path created'}, status=200)
-            except Exception as e:
-                print(e)
-                
-    return JsonResponse({'error': 'Request refused'}, status=405)
-    
 def upload_variant_image(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
