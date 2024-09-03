@@ -14,7 +14,6 @@ def home(request):
 def make_user_directory(request):
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
-            return JsonResponse({'detail': 'Path created'}, status=200)
             try:
                 user_id = request.POST.get('user_id')
                 store = json.loads(request.POST.get('store'))
