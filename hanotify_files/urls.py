@@ -23,9 +23,12 @@ from django.conf import settings
 
 
 urlpatterns = [
-    ## files urls
     path('', views.home),
     path('admin/', admin.site.urls),
+    # used for seller
+    path('get-store', views.get_store),
+    path('get-product', views.get_product),
+    
     path('upload-rich-text-image', views.upload_rich_text_image ),
     path('upload-variant-image', views.upload_variant_image ),
     path('upload-gallery-image', views.upload_gellery_image ),
@@ -40,12 +43,10 @@ urlpatterns = [
     path('make-user-directory', views.make_user_directory),
     path('delete-product', views.delete_product),
     path('toggle-product-state', views.toggle_product_state),
-    path('get-product', views.get_product),
     path('get-product-for-edit', views.get_product_for_edit),
     path('upload-store-logo', views.upload_store_logo),
     path('save-store', views.save_store),
     path('toggle-store-state', views.toggle_store_state),
-    path('get-store', views.get_store),
     path('get-store-for-edit', views.get_store_for_edit),
     path('save-fb-pixel', views.save_fb_pixel),
     path('delete-fb-pixel',views.delete_fb_pixel ),

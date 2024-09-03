@@ -1,17 +1,15 @@
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
 import os, shutil, json
 from django.conf import settings
 from constants import media_files_domain
 from .middleware import user_from_request
-from time import sleep
 from PIL import Image as IM
 from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo
 from django.http import FileResponse
 
 def home(request):
     absolute_uri = request.build_absolute_uri()
-    return JsonResponse({'detail': absolute_uri})
+    return JsonResponse({'API HOME': absolute_uri})
 
 def make_store_directory(request):
     if request.method == 'POST' :
@@ -61,6 +59,7 @@ def delete_store_directory(request):
                 print(e)
 
 def make_product_directory(request):
+    print(request.POST)
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
             try:
@@ -478,15 +477,6 @@ def save_category(request):
     CetegoryImage.objects.filter(store_id = store_id, category=None).delete()
     return JsonResponse({}, status=200)
 
-def get_product(request):
-    product_id = request.GET.get('product_id')
-    product = Product.objects.get(id=product_id)
-    if product.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
-        return response
-    else:
-        return JsonResponse({'detail': 'File not found'}, status=400)
-
 def get_product_for_edit(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
@@ -542,17 +532,6 @@ def toggle_store_state(request):
             except Exception as e:
                 print(e)
                 return JsonResponse({'Detail': 'Product deleted unsuccessfully'}, status=400)
-            
-def get_store(request):
-    data = request.GET
-    domain = data.get('id')
-    store = Store.objects.get(domain = domain)
-
-    if store.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
-        return response
-    else:
-        return JsonResponse({'detail': 'File not found'}, status=400)
 
 def get_store_for_edit(request):
     user_data = user_from_request(request)
@@ -608,3 +587,26 @@ def delete_fb_pixel(request):
     with open(file_path, 'w') as json_file:
         json.dump(data, json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
+
+## STORE ONLY
+
+def get_store(request):
+    data = request.GET
+    domain = data.get('id')
+    store = Store.objects.get(domain = domain)
+
+    if store.active:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
+        return response
+    else:
+        return JsonResponse({'detail': 'File not found'}, status=400)
+    
+
+def get_product(request):
+    product_id = request.GET.get('product_id')
+    product = Product.objects.get(id=product_id)
+    if product.active:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
+        return response
+    else:
+        return JsonResponse({'detail': 'File not found'}, status=400)
