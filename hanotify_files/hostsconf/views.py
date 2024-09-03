@@ -5,7 +5,7 @@ from django.conf import settings
 # delete user and delete category
 def render_store(request, path=None):
     domain = request.get_host()
-    print(domain, request.build_full_url())
+    print(domain, request.build_absolute_uri())
     domain = domain.replace(':8080', '') # remove this line
     with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
         store = json.load(json_file)
