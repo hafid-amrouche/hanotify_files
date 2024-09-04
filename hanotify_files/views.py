@@ -32,7 +32,12 @@ def make_user_directory(request):
 
                 return JsonResponse({'detail': 'Path created'}, status=200)
             except Exception as e:
-                print(e)
+                print(str(e))
+                return JsonResponse({
+                    'error': 'Request refused 3',
+                    "message": str(e)
+                    }, status=400)
+        return JsonResponse({'error': 'Request refused 2'}, status=400)
                 
     return JsonResponse({'error': 'Request refused'}, status=405)
     
