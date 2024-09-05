@@ -35,7 +35,7 @@ def render_product(request, slug, product_id):
         'title': product.get('title'),
         'logo': store.get('logo') or "",
         'description': product.get('miniDescription') or store.get('description'),
-        'image': product.get('galleryImages')[0] if product.get('galleryImages')[0] else  (store.get('logo') or ""),
+        'image': product.get('galleryImages')[0] if product.get('galleryImages') else  (store.get('logo') or ""),
         'url': request.build_absolute_uri()
     })
 
