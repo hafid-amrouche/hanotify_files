@@ -2,6 +2,7 @@ from django.shortcuts import render
 import json
 from django.conf import settings
 from files_management.models import Store
+from django.http import HttpResponse 
 
 # delete user and delete category
 def render_store(request, path=None):
@@ -10,7 +11,7 @@ def render_store(request, path=None):
     try:
         store = Store.objects.get(domain = domain)
     except:
-        return ''
+        return HttpResponse(status=200)
     with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
@@ -29,7 +30,7 @@ def render_product(request, slug, product_id):
     try:
         store = Store.objects.get(domain = domain)
     except:
-        return ''
+        return HttpResponse(status=200)
     with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
