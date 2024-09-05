@@ -7,7 +7,10 @@ from files_management.models import Store
 def render_store(request, path=None):
     domain = request.get_host()
     domain = domain.replace(':8080', '') # remove this line
-    store = Store.objects.get(domain = domain)
+    try:
+        store = Store.objects.get(domain = domain)
+    except:
+        return ''
     with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
@@ -23,7 +26,10 @@ def render_store(request, path=None):
 def render_product(request, slug, product_id):
     domain = request.get_host()
     domain = domain.replace(':8080', '')
-    store = Store.objects.get(domain = domain)
+    try:
+        store = Store.objects.get(domain = domain)
+    except:
+        return ''
     with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
