@@ -1,13 +1,14 @@
 from django.shortcuts import render
 import json
 from django.conf import settings
-from django.http import JsonResponse
+from files_management.models import Store
 
 # delete user and delete category
 def render_store(request, path=None):
     domain = request.get_host()
     domain = domain.replace(':8080', '') # remove this line
-    with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
+    store = Store.objects.get(domain = domain)
+    with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
     return render(request, 'index.html', context={
@@ -22,7 +23,8 @@ def render_store(request, path=None):
 def render_product(request, slug, product_id):
     domain = request.get_host()
     domain = domain.replace(':8080', '')
-    with open(settings.BASE_DIR / f'json/users/stores/{domain}.json', 'r') as json_file:
+    store = Store.objects.get(domain = domain)
+    with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
         store = json.load(json_file)
     
     product_id = product_id
