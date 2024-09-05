@@ -26,7 +26,6 @@ def render_store(request, path=None):
     
 def render_product(request, slug, product_id):
     domain = request.get_host()
-    domain = domain.replace(':8080', '')
     try:
         store = Store.objects.get(domain = domain)
     except:

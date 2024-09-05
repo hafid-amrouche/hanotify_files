@@ -27,7 +27,7 @@ def make_user_directory(request):
                     user_id=user_id,
                     domain=store['domain'],
                 )
-                with open(settings.BASE_DIR / f'json/users/stores/{store['id']}.json', 'w') as json_file:
+                with open(settings.BASE_DIR / f'json/users/stores/{store["id"]}.json', 'w') as json_file:
                     json.dump(store, json_file)
 
                 return JsonResponse({'detail': 'Path created'}, status=200)
@@ -41,7 +41,6 @@ def make_user_directory(request):
                 
     return JsonResponse({'error': 'Request refused'}, status=405)
     
-
 def make_store_directory(request):
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
