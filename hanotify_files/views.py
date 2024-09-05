@@ -27,7 +27,7 @@ def make_user_directory(request):
                     user_id=user_id,
                     domain=store['domain'],
                 )
-                with open(settings.BASE_DIR / f'json/users/stores/{store["domain"]}.json', 'w') as json_file:
+                with open(settings.BASE_DIR / f'json/users/stores/{store['id']}.json', 'w') as json_file:
                     json.dump(store, json_file)
 
                 return JsonResponse({'detail': 'Path created'}, status=200)
@@ -339,7 +339,6 @@ def upload_store_logo(request):
                 image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
                 image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
                 image_pil.save(image_path)
-                print(image_path)
                 store_logo.url = image_url
                 store_logo.path = image_path
                 store_logo.size = os.path.getsize(image_path) / 1024
@@ -521,7 +520,7 @@ def save_store(request):
         except:
             pass
    
-    with open(settings.BASE_DIR / f'json/users/stores/{store.domain}.json', 'w') as json_file:
+    with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'w') as json_file:
         json.dump(store_data, json_file)
 
     return JsonResponse({'detail' : 'success'}, status=200)
@@ -545,7 +544,7 @@ def get_store_for_edit(request):
     store_id = request.GET.get('store_id')
     store = Store.objects.get(id=store_id, user_id=user_id)
     try:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.id}.json', 'rb'))
         return response
     except:
         return JsonResponse({'detail': 'File not found'}, status=400)
@@ -557,9 +556,9 @@ def save_fb_pixel(request):
         return JsonResponse({'detail': "Wrong credintials"}, status=400)
     
     fb_pixel = data.get('fb_pixel')
-    store_domain = data.get('store_domain')
+    store_id = data.get('store_id')
     
-    file_path = settings.BASE_DIR / f'json/users/stores/{store_domain}.json'
+    file_path = settings.BASE_DIR / f'json/users/stores/{store_id}.json'
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
 
@@ -577,9 +576,9 @@ def delete_fb_pixel(request):
     if MESSAGING_KEY != settings.MESSAGING_KEY:
         return JsonResponse({'detail': "Wrong credintials"}, status=400)
     
-    store_domain = data.get('store_domain')
+    store_id = data.get('store_id')
     
-    file_path = settings.BASE_DIR / f'json/users/stores/{store_domain}.json'
+    file_path = settings.BASE_DIR / f'json/users/stores/{store_id}.json'
     with open(file_path, 'r') as json_file:
         data = json.load(json_file)
 
@@ -602,7 +601,7 @@ def get_store(request):
     store = Store.objects.get(domain = domain)
 
     if store.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.domain}.json', 'rb'))
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/stores/{store.id}.json', 'rb'))
         return response
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)
