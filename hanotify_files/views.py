@@ -6,6 +6,7 @@ from .middleware import user_from_request
 from PIL import Image as IM
 from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo
 from django.http import FileResponse
+from django.shortcuts import render
 
 def home(request):
     absolute_uri = request.build_absolute_uri()

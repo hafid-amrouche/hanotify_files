@@ -1,8 +1,9 @@
-from django.shortcuts import render
 import json
 from django.conf import settings
 from files_management.models import Store
 from django.http import HttpResponse 
+from django.shortcuts import render
+from django.template.loader import render_to_string
 
 # delete user and delete category
 def render_store(request, path=None):
@@ -48,3 +49,6 @@ def render_product(request, slug, product_id):
         'url': request.build_absolute_uri()
     })
 
+
+def catch_remaining_path(request, path):
+    return render(request, 'empty.html')
