@@ -50,6 +50,7 @@ urlpatterns = [
     path('get-store-for-edit', views.get_store_for_edit),
     path('save-fb-pixel', views.save_fb_pixel),
     path('delete-fb-pixel',views.delete_fb_pixel ),
+    path('update-tiktok-pixels', views.update_tiktok_pixels),
 ]
 
 if settings.DEBUG:
