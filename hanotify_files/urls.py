@@ -48,8 +48,7 @@ urlpatterns = [
     path('save-store', views.save_store),
     path('toggle-store-state', views.toggle_store_state),
     path('get-store-for-edit', views.get_store_for_edit),
-    path('save-fb-pixel', views.save_fb_pixel),
-    path('delete-fb-pixel',views.delete_fb_pixel ),
+    path('update-fb-pixel', views.update_fb_pixels),
     path('update-tiktok-pixels', views.update_tiktok_pixels),
 ]
 

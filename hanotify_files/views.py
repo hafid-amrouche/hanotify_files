@@ -549,49 +549,30 @@ def get_store_for_edit(request):
     except:
         return JsonResponse({'detail': 'File not found'}, status=400)
     
-def save_fb_pixel(request):
+def update_fb_pixels(request):
     data = request.POST
     MESSAGING_KEY = data.get('MESSAGING_KEY')
     if MESSAGING_KEY != settings.MESSAGING_KEY:
         return JsonResponse({'detail': "Wrong credintials"}, status=400)
     
-    fb_pixel = data.get('fb_pixel')
+    fb_pixels = data.getlist('fb_pixels')
     store_id = data.get('store_id')
     
     file_path = settings.BASE_DIR / f'json/users/stores/{store_id}.json'
     with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
+        store_data = json.load(json_file)
 
     # Add or update the 'FBPixel' property
-    data['facebookPixelId'] = fb_pixel
+    if fb_pixels == []:
+        store_data.pop('facebookPixelsId')
+    else:
+        store_data['facebookPixelsId'] = fb_pixels
 
     # Save the updated JSON data back to the file
     with open(file_path, 'w') as json_file:
-        json.dump(data, json_file)
+        json.dump(store_data, json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
 
-def delete_fb_pixel(request):
-    data = request.POST
-    MESSAGING_KEY = data.get('MESSAGING_KEY')
-    if MESSAGING_KEY != settings.MESSAGING_KEY:
-        return JsonResponse({'detail': "Wrong credintials"}, status=400)
-    
-    store_id = data.get('store_id')
-    
-    file_path = settings.BASE_DIR / f'json/users/stores/{store_id}.json'
-    with open(file_path, 'r') as json_file:
-        data = json.load(json_file)
-
-    # Add or update the 'FBPixel' property
-    try:
-        data.pop('facebookPixelId')
-    except:
-        pass
-
-    # Save the updated JSON data back to the file
-    with open(file_path, 'w') as json_file:
-        json.dump(data, json_file)
-    return JsonResponse({'detail' : 'success'}, status=200)
 
 def update_tiktok_pixels(request):
     data = request.POST
@@ -606,7 +587,10 @@ def update_tiktok_pixels(request):
         store_data = json.load(json_file)
 
     # Add or update the 'FBPixel' property
-    store_data['tiktokPixelsId'] = tiktok_pixels
+    if tiktok_pixels == []:
+        store_data.pop('tiktokPixelsId')
+    else:
+        store_data['tiktokPixelsId'] = tiktok_pixels
 
     # Save the updated JSON data back to the file
     with open(file_path, 'w') as json_file:
