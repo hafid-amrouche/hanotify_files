@@ -4,7 +4,7 @@ from django.conf import settings
 from constants import media_files_domain
 from .middleware import user_from_request
 from PIL import Image as IM
-from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo
+from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo, StoreFavicon, StoreImage
 from django.http import FileResponse
 from django.shortcuts import render
 
@@ -21,6 +21,7 @@ def make_user_directory(request):
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}')
+                os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/images')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/categories')
                 os.makedirs(f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store["id"]}/products')
                 Store.objects.create(
@@ -299,6 +300,7 @@ def upload_category_image(request):
             if image:
                 image_pil = IM.open(image)
                 width, height = image_pil.size
+                print(width, height)
                 if (width > 480 or height > 480):
                     return JsonResponse({'error': 'Invalid request 1'}, status=400)
                 if image_pil.format != 'WEBP':
@@ -343,6 +345,39 @@ def upload_store_logo(request):
                 store_logo.path = image_path
                 store_logo.size = os.path.getsize(image_path) / 1024
                 store_logo.save()
+                return JsonResponse({
+                    'url': image_url,
+                }, status=200)
+            else: 
+                print('No image')
+        else: 
+            print('No user ID')
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def upload_store_favicon(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    
+    if request.method == 'POST' :
+        if user_id:
+            store_id = request.POST.get('store_id')
+            Store.objects.get(id=store_id, user_id=user_id)
+            image = request.FILES.get('image')
+            if image:
+                image_pil = IM.open(image)
+                width, height = image_pil.size
+                if (width > 120 or height > 120):
+                    return JsonResponse({'error': 'Invalid request'}, status=400)
+                
+                store_favicon = StoreFavicon.objects.create()                
+                image_extention = f'users/{user_id}/stores/{store_id}/{store_favicon.id}.{image_pil.format.lower()}'     
+                image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
+                image_pil.save(image_path)
+                store_favicon.url = image_url
+                store_favicon.path = image_path
+                store_favicon.size = os.path.getsize(image_path) / 1024
+                store_favicon.save()
                 return JsonResponse({
                     'url': image_url,
                 }, status=200)
@@ -397,10 +432,15 @@ def delete_image(request):
                         url=image_url
                     ).delete()
 
-                elif image_type == 'store':
+                elif image_type == 'store/logo':
                     store_id = data.get('store_id')
                     store = Store.objects.get(id=store_id, user_id=user_id)
                     StoreLogo.objects.get(store=store).delete()
+                
+                elif image_type == 'store/favicon':
+                    store_id = data.get('store_id')
+                    store = Store.objects.get(id=store_id, user_id=user_id)
+                    StoreFavicon.objects.get(store=store).delete()
             except Exception as e:
                 print(e)
                 pass
@@ -482,6 +522,44 @@ def save_category(request):
     CetegoryImage.objects.filter(store_id = store_id, category=None).delete()
     return JsonResponse({}, status=200)
 
+def update_category(request):
+    data = json.loads(request.POST.get('data'))
+    MESSAGING_KEY = data.get('MESSAGING_KEY')
+    if MESSAGING_KEY != settings.MESSAGING_KEY:
+        return JsonResponse({'detail': "Wrong credintials"}, status=400)
+    
+    store_id = data.get('store_id')
+    categories_images = CetegoryImage.objects.filter(store_id = store_id)
+    category_image = data.get('category_image')
+    category_image = categories_images.get(url=category_image)
+    category = Category.objects.get(
+        id = data.get('category_id'),
+        store_id=store_id
+    ) 
+    if category_image.category != category:
+        try:
+            category.image.delete()
+        except:
+            pass
+        category_image.category = category
+        category_image.save()
+     
+    category_image.save()
+    categories_images.filter(category=None).delete()
+    return JsonResponse({}, status=200)
+
+
+def delete_category(request):
+    data = json.loads(request.POST.get('data'))
+    MESSAGING_KEY = data.get('MESSAGING_KEY')
+    if MESSAGING_KEY != settings.MESSAGING_KEY:
+        return JsonResponse({'detail': "Wrong credintials"}, status=400)
+    
+    category_id = data.get('category_id')
+    category= Category.objects.get(id=category_id)
+    category.delete()
+    return JsonResponse({}, status=200)
+
 def get_product_for_edit(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
@@ -503,6 +581,8 @@ def save_store(request):
     store = Store.objects.get(id=store_id)
     store_data = json.loads(data.get('store'))
     logo = store_data.get('logo')
+    images_urls = data.getlist('images_urls')
+    (StoreImage.objects.filter(store=store).exclude(url__in = images_urls)).delete()
     if logo:
         try:
             if (store.logo.url != logo):
@@ -519,9 +599,31 @@ def save_store(request):
             store.logo.delete()
         except:
             pass
-   
+    favicon = store_data.get('favicon')
+    if favicon:
+        try:
+            if (store.favicon.url != favicon):
+                store.favicon.delete()
+                store_favicon = StoreFavicon.objects.get(url = favicon)
+                store_favicon.store = store
+                store_favicon.save()
+        except:
+            store_favicon = StoreFavicon.objects.get(url = favicon)
+            store_favicon.store = store
+            store_favicon.save()  
+    else:
+        try:
+            store.favicon.delete()
+        except:
+            pass
+
+    with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'r') as json_file:
+        old_store_data = json.load(json_file)
+
+    new_store_data = {**old_store_data, **store_data}  
     with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'w') as json_file:
-        json.dump(store_data, json_file)
+        json.dump(new_store_data, json_file)
+
 
     return JsonResponse({'detail' : 'success'}, status=200)
 
@@ -596,6 +698,42 @@ def update_tiktok_pixels(request):
     with open(file_path, 'w') as json_file:
         json.dump(store_data, json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
+
+def upload_store_image(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    
+    if request.method == 'POST' :
+        if user_id:
+            store_id = request.POST.get('store_id')
+            image = request.FILES.get('image')
+            if image:
+                image_pil = IM.open(image)
+                width, height = image_pil.size
+                if (width > 640 ):
+                    return JsonResponse({'error': 'Invalid request 1'}, status=400)
+                if image_pil.format != 'WEBP':
+                    return JsonResponse({'error': 'Invalid request 2'}, status=400)
+                
+                image_object = StoreImage.objects.create(
+                    store_id=store_id,
+                    type='store/footer-image',
+                )
+                image_extention = f'users/{user_id}/stores/{store_id}/images/{image_object.id}.webp'     
+                image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
+                image_pil.save(image_path)
+                image_size = os.path.getsize(image_path) / 1024
+                image_object.url = image_url
+                image_object.path = image_path
+                image_object.size = image_size
+                image_object.save()
+                return JsonResponse({
+                    'url': image_url,
+                }, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 
 
 ## STORE ONLY

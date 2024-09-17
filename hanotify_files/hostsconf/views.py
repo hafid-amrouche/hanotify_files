@@ -19,10 +19,12 @@ def render_store(request, path=None):
     return render(request, 'index.html', context={
         'store': json.dumps(store),
         'title': store.get('name'),
-        'logo': store.get('logo') or "",
+        'favicon': store.get('favicon') or "",
         'description': store.get('description'),
+        'lang': store.get('language'),
+        'dir': 'rtl' if store.get('language') == 'ar' else 'ltr',
         'image': store.get('logo') or "", # next will be store image
-        'url': request.build_absolute_uri()
+        'url': request.build_absolute_uri(),
     })
     
 def render_product(request, slug, product_id):
@@ -43,7 +45,9 @@ def render_product(request, slug, product_id):
         'store': json.dumps(store),
         'product': json.dumps(product),
         'title': product.get('title'),
-        'logo': store.get('logo') or "",
+        'favicon': store.get('favicon') or "",
+        'lang': store.get('language'),
+        'dir': 'rtl' if store.get('language') == 'ar' else 'ltr',
         'description': product.get('miniDescription') or store.get('description'),
         'image': product.get('galleryImages')[0] if product.get('galleryImages') else (store.get('logo') or ""),
         'url': request.build_absolute_uri()

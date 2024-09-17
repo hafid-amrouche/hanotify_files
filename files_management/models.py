@@ -15,6 +15,13 @@ class StoreLogo(models.Model): # remove logos with store = None after 24 hours
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
     uploaded_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
+class StoreFavicon(models.Model): # remove favicons with store = None after 24 hours
+    store = models.OneToOneField(Store, on_delete=models.CASCADE, null=True, blank=True, related_name='favicon')
+    url = models.TextField(null=True, blank=True)
+    path = models.TextField(null=True, blank=True)
+    size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
+    uploaded_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
 def store_image_pre_delete(sender, instance, **kwargs):
     try:
         os.remove(instance.path)
@@ -23,14 +30,11 @@ def store_image_pre_delete(sender, instance, **kwargs):
 
 pre_delete.connect(store_image_pre_delete, StoreLogo)
 
-
-
 class Product(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
     user_id = models.PositiveBigIntegerField(null=True, blank=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE, null=True, blank=True)
     active = models.BooleanField(default=True)
-
 
 # Create your models here.
 class ProductImage(models.Model):  # remove logos with is_in_use = false after 24 hours
@@ -56,17 +60,14 @@ class Category(models.Model):
     user_id = models.PositiveBigIntegerField(null=True, blank=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE, null=True, blank=True)
     id = models.PositiveBigIntegerField(primary_key=True)
-    
-   
 
 class CetegoryImage(models.Model): # remove logos with category = None after 24 hours
     store = models.ForeignKey(Store, on_delete=models.SET_NULL, null=True, blank=True)
-    category = models.OneToOneField(Category, on_delete=models.CASCADE, null=True, blank=True)
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, null=True, blank=True, related_name='image')
     url = models.TextField(null=True, blank=True)
     path = models.TextField(null=True, blank=True)
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
     uploaded_at = models.DateTimeField(auto_now_add=True, null=True)
-
 
 def category_image_pre_delete(sender, instance, **kwargs):
     try:
@@ -75,3 +76,14 @@ def category_image_pre_delete(sender, instance, **kwargs):
         print(e)
 
 pre_delete.connect(image_pre_delete, CetegoryImage)
+
+class StoreImage(models.Model):  # remove logos with is_in_use = false after 24 hours
+    store = models.ForeignKey(Store, null=True, blank=True, on_delete=models.CASCADE)
+    is_in_use = models.BooleanField(default=False)
+    type =  models.TextField()
+    url = models.TextField(null=True, blank=True)
+    path = models.TextField(null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
+
+pre_delete.connect(image_pre_delete, StoreImage)

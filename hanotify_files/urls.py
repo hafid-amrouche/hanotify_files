@@ -40,16 +40,20 @@ urlpatterns = [
     path('save-product', views.save_product),
     path('save-galley-images', views.save_gallery_images),
     path('save-category', views.save_category),
+    path('update-category', views.update_category),
+    path('delete-category', views.delete_category),
     path('make-user-directory', views.make_user_directory),
     path('delete-product', views.delete_product),
     path('toggle-product-state', views.toggle_product_state),
     path('get-product-for-edit', views.get_product_for_edit),
     path('upload-store-logo', views.upload_store_logo),
+    path('upload-store-favicon', views.upload_store_favicon),
     path('save-store', views.save_store),
     path('toggle-store-state', views.toggle_store_state),
     path('get-store-for-edit', views.get_store_for_edit),
     path('update-fb-pixel', views.update_fb_pixels),
     path('update-tiktok-pixels', views.update_tiktok_pixels),
+    path('upload-store-image', views.upload_store_image),
 ]
 
 if settings.DEBUG:
