@@ -25,10 +25,13 @@ from django.conf import settings
 urlpatterns = [
     path('', views.home),
     path('admin/', admin.site.urls),
-    # used for seller
+
+    # used for clients
     path('get-store', views.get_store),
     path('get-product', views.get_product),
+    path('get-thank-you', views.get_thank_you),
     
+    # used for seller
     path('upload-rich-text-image', views.upload_rich_text_image ),
     path('upload-variant-image', views.upload_variant_image ),
     path('upload-gallery-image', views.upload_gellery_image ),
@@ -54,6 +57,8 @@ urlpatterns = [
     path('update-fb-pixel', views.update_fb_pixels),
     path('update-tiktok-pixels', views.update_tiktok_pixels),
     path('upload-store-image', views.upload_store_image),
+    path('get-thank-you-for-edit', views.get_thank_you_for_edit),
+    path('save-thank-you', views.save_thank_you),
 ]
 
 if settings.DEBUG:

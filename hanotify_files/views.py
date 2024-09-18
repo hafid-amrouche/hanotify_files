@@ -29,8 +29,17 @@ def make_user_directory(request):
                     user_id=user_id,
                     domain=store['domain'],
                 )
-                with open(settings.BASE_DIR / f'json/users/stores/{store["id"]}.json', 'w') as json_file:
-                    json.dump(store, json_file)
+                with open(settings.BASE_DIR / f'json/users/stores/{store["id"]}.json', 'w') as store_json_file:
+                    json.dump(store, store_json_file)
+                
+                thank_you = {
+                    'showOrderInfo': True,
+                    'thankYouText': None,
+                    'showRelatedProducts': True
+                }
+
+                with open(settings.BASE_DIR / f'json/users/thank-you/{store["id"]}.json', 'w') as thank_you_json_file:
+                    json.dump(thank_you, thank_you_json_file)
 
                 return JsonResponse({'detail': 'Path created'}, status=200)
             except Exception as e:
@@ -733,7 +742,26 @@ def upload_store_image(request):
                 }, status=200)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
+def get_thank_you_for_edit(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    store_id = request.GET.get('store_id')
+    store = Store.objects.get(id=store_id, user_id=user_id)
+    try:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/{store.id}.json', 'rb'))
+        return response
+    except:
+        return JsonResponse({'detail': 'File not found'}, status=400)
+  
+def save_thank_you(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    data = json.loads(request.body)
+    store_id = data.get('store_id')
+    Store.objects.get(id=store_id, user_id=user_id)
+    with open(settings.BASE_DIR / f'json/users/thank-you/{store_id}.json', 'w') as json_file:
+        json.dump(data.get('thank_you'), json_file)
+    return JsonResponse({'detail' : 'success'}, status=200)
 
 
 ## STORE ONLY
@@ -749,12 +777,22 @@ def get_store(request):
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)
     
-
 def get_product(request):
     product_id = request.GET.get('product_id')
     product = Product.objects.get(id=product_id)
     if product.active:
         response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
+        return response
+    else:
+        return JsonResponse({'detail': 'File not found'}, status=400)
+
+def get_thank_you(request):
+    data = request.GET
+    domain = data.get('domain')
+    store = Store.objects.get(domain = domain)
+
+    if store.active:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/{store.id}.json', 'rb'))
         return response
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)
