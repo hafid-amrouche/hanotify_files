@@ -41,6 +41,12 @@ def make_user_directory(request):
                 with open(settings.BASE_DIR / f'json/users/thank-you/{store["id"]}.json', 'w') as thank_you_json_file:
                     json.dump(thank_you, thank_you_json_file)
 
+                with open(settings.BASE_DIR / f'json/users/privacy-policy/{store["id"]}.json', 'w') as json_file:
+                    json.dump({'message' : ''}, json_file)
+                
+                with open(settings.BASE_DIR / f'json/users/terms-of-service/{store["id"]}.json', 'w') as json_file:
+                    json.dump({'message' : ''}, json_file)
+
                 return JsonResponse({'detail': 'Path created'}, status=200)
             except Exception as e:
                 print(str(e))
@@ -684,7 +690,6 @@ def update_fb_pixels(request):
         json.dump(store_data, json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
 
-
 def update_tiktok_pixels(request):
     data = request.POST
     MESSAGING_KEY = data.get('MESSAGING_KEY')
@@ -749,9 +754,34 @@ def get_thank_you_for_edit(request):
     store = Store.objects.get(id=store_id, user_id=user_id)
     try:
         response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/{store.id}.json', 'rb'))
-        return response
     except:
-        return JsonResponse({'detail': 'File not found'}, status=400)
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/default.json', 'rb'))    
+    return response
+    
+def get_privacy_policy_for_edit(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    store_id = request.GET.get('store_id')
+    store = Store.objects.get(id=store_id, user_id=user_id)
+    try:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/privacy-policy/{store.id}.json', 'rb'))
+    except:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/privacy-policy/default.json', 'rb'))
+    
+    return response
+
+
+def get_terms_of_service_edit(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    store_id = request.GET.get('store_id')
+    store = Store.objects.get(id=store_id, user_id=user_id)
+    try:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/terms-of-service/{store.id}.json', 'rb'))
+    except:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/terms-of-service/default.json', 'rb'))
+    
+    return response
   
 def save_thank_you(request):
     user_data = user_from_request(request)
@@ -761,6 +791,26 @@ def save_thank_you(request):
     Store.objects.get(id=store_id, user_id=user_id)
     with open(settings.BASE_DIR / f'json/users/thank-you/{store_id}.json', 'w') as json_file:
         json.dump(data.get('thank_you'), json_file)
+    return JsonResponse({'detail' : 'success'}, status=200)
+
+def save_privacy_policy(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    data = json.loads(request.body)
+    store_id = data.get('store_id')
+    Store.objects.get(id=store_id, user_id=user_id)
+    with open(settings.BASE_DIR / f'json/users/privacy-policy/{store_id}.json', 'w') as json_file:
+        json.dump(data.get('privacy_policy'), json_file)
+    return JsonResponse({'detail' : 'success'}, status=200)
+
+def save_terms_of_service(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    data = json.loads(request.body)
+    store_id = data.get('store_id')
+    Store.objects.get(id=store_id, user_id=user_id)
+    with open(settings.BASE_DIR / f'json/users/terms-of-service/{store_id}.json', 'w') as json_file:
+        json.dump(data.get('terms_of_service'), json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
 
 
@@ -792,7 +842,40 @@ def get_thank_you(request):
     store = Store.objects.get(domain = domain)
 
     if store.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/{store.id}.json', 'rb'))
+        try:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/{store.id}.json', 'rb'))
+        except:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/thank-you/default.json', 'rb'))
         return response
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)
+    
+def get_privacy_policy(request):
+    data = request.GET
+    domain = data.get('domain')
+    store = Store.objects.get(domain = domain)
+
+    if store.active:
+        try:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/privacy-policy/{store.id}.json', 'rb'))
+        except:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/privacy-policy/default.json', 'rb'))
+        return response
+    else:
+        return JsonResponse({'detail': 'File not found'}, status=400)
+    
+def get_terms_of_service(request):
+    data = request.GET
+    domain = data.get('domain')
+    store = Store.objects.get(domain = domain)
+
+    if store.active:
+        try:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/terms-of-service/{store.id}.json', 'rb'))
+        except:
+            response = FileResponse(open(f'{settings.JSON_ROOT}/users/terms-of-service/default.json', 'rb'))
+        return response
+    else:
+        return JsonResponse({'detail': 'File not found'}, status=400)
+
+

@@ -30,6 +30,8 @@ urlpatterns = [
     path('get-store', views.get_store),
     path('get-product', views.get_product),
     path('get-thank-you', views.get_thank_you),
+    path('get-privacy-policy', views.get_privacy_policy),
+    path('get-terms-of-service', views.get_terms_of_service),
     
     # used for seller
     path('upload-rich-text-image', views.upload_rich_text_image ),
@@ -59,6 +61,10 @@ urlpatterns = [
     path('upload-store-image', views.upload_store_image),
     path('get-thank-you-for-edit', views.get_thank_you_for_edit),
     path('save-thank-you', views.save_thank_you),
+    path('get-privacy-policy-for-edit', views.get_privacy_policy_for_edit),
+    path('save-privacy-policy', views.save_privacy_policy),
+    path('get-terms-of-service-for-edit', views.get_terms_of_service_edit),
+    path('save-terms-of-service', views.save_terms_of_service),
 ]
 
 if settings.DEBUG:
