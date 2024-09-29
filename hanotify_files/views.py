@@ -6,7 +6,6 @@ from .middleware import user_from_request
 from PIL import Image as IM
 from files_management.models import ProductImage, Product, Store, Category, CetegoryImage, StoreLogo, StoreFavicon, StoreImage
 from django.http import FileResponse
-from django.shortcuts import render
 
 def home(request):
     absolute_uri = request.build_absolute_uri()
@@ -133,21 +132,14 @@ def delete_product(request):
                 product_id = request.POST.get('product_id')
                 user_id = request.POST.get('user_id')
                 store_id = request.POST.get('product_id')
-                product_path = f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}/products/{product_id}'
                 try:
                     Product.objects.get(
                         id = product_id,
+                        user_id = user_id,
+                        store_id=store_id
                     ).delete()
                 except:
                     pass
-                
-                shutil.rmtree(product_path)
-                try:
-                    os.remove(f'{settings.JSON_ROOT}/users/products/{product_id}.json')
-                except Exception as e:
-                    print(e)
-                    pass
-                
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
                 print(e)
