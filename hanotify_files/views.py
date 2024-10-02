@@ -143,7 +143,6 @@ def delete_product(request):
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
                 print(e)
-            print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
             return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
         return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
 
@@ -555,7 +554,6 @@ def update_category(request):
     categories_images.filter(category=None).delete()
     return JsonResponse({}, status=200)
 
-
 def delete_category(request):
     data = json.loads(request.POST.get('data'))
     MESSAGING_KEY = data.get('MESSAGING_KEY')
@@ -716,7 +714,7 @@ def upload_store_image(request):
             if image:
                 image_pil = IM.open(image)
                 width, height = image_pil.size
-                if (width > 640 ):
+                if (width > 640 or height > 640):
                     return JsonResponse({'error': 'Invalid request 1'}, status=400)
                 if image_pil.format != 'WEBP':
                     return JsonResponse({'error': 'Invalid request 2'}, status=400)
@@ -805,6 +803,37 @@ def save_terms_of_service(request):
         json.dump(data.get('terms_of_service'), json_file)
     return JsonResponse({'detail' : 'success'}, status=200)
 
+def upload_swiper_image(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    
+    if request.method == 'POST' :
+        if user_id:
+            store_id = request.POST.get('store_id')
+            image = request.FILES.get('image')
+            if image:
+                image_pil = IM.open(image)
+                width, height = image_pil.size
+                if (width > 2048 or height > 2048):
+                    return JsonResponse({'error': 'Invalid request 1'}, status=400)
+                
+                image_object = StoreImage.objects.create(
+                    store_id=store_id,
+                    type='store/home-page/swiper-image',
+                )
+                image_extention = f'users/{user_id}/stores/{store_id}/images/{image_object.id}.webp'     
+                image_url = f'{media_files_domain}/{settings.MEDIA_URL}/{image_extention}'
+                image_path = os.path.join(settings.MEDIA_ROOT.replace('\\', '/'), image_extention)
+                image_pil.save(image_path)
+                image_size = os.path.getsize(image_path) / 1024
+                image_object.url = image_url
+                image_object.path = image_path
+                image_object.size = image_size
+                image_object.save()
+                return JsonResponse({
+                    'url': image_url,
+                }, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 ## STORE ONLY
 
