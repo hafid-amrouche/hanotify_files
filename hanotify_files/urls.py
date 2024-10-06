@@ -39,6 +39,7 @@ urlpatterns = [
     path('upload-gallery-image', views.upload_gellery_image ),
     path('upload-category-image', views.upload_category_image ),
     path('delete-image', views.delete_image ),
+    path('delete-images', views.delete_images ),
     path('delete-all-gallery-images', views.delete_all_gallery_images),
     path('make-product-directory', views.make_product_directory),
     path('resize', views.resized_image),

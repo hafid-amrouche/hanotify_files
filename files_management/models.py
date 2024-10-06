@@ -49,7 +49,7 @@ pre_delete.connect(post_delete_store, Store)
 
 ## post delete images classes function
 
-def store_image_pre_delete(sender, instance, **kwargs):
+def image_pre_delete(sender, instance, **kwargs):
     try:
         os.remove(instance.path)
     except Exception as e:
@@ -63,7 +63,7 @@ class StoreLogo(models.Model): # remove logos with store = None after 24 hours
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
     uploaded_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-pre_delete.connect(store_image_pre_delete, StoreLogo)
+pre_delete.connect(image_pre_delete, StoreLogo)
 
 ## store favicon
 class StoreFavicon(models.Model): # remove favicons with store = None after 24 hours
@@ -73,7 +73,7 @@ class StoreFavicon(models.Model): # remove favicons with store = None after 24 h
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
     uploaded_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-pre_delete.connect(store_image_pre_delete, StoreFavicon)
+pre_delete.connect(image_pre_delete, StoreFavicon)
 
 ## Product
 class Product(models.Model):
@@ -112,7 +112,7 @@ class ProductImage(models.Model):  # remove logos with is_in_use = false after 2
     uploaded_at = models.DateTimeField(auto_now_add=True)
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
 
-pre_delete.connect(store_image_pre_delete, ProductImage)
+pre_delete.connect(image_pre_delete, ProductImage)
 
 # Create your models here.
 class Category(models.Model):
@@ -128,7 +128,7 @@ class CetegoryImage(models.Model): # remove logos with category = None after 24 
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
     uploaded_at = models.DateTimeField(auto_now_add=True, null=True)
 
-pre_delete.connect(store_image_pre_delete, CetegoryImage)
+pre_delete.connect(image_pre_delete, CetegoryImage)
 
 class StoreImage(models.Model):  # remove logos with is_in_use = false after 24 hours
     store = models.ForeignKey(Store, null=True, blank=True, on_delete=models.CASCADE)
@@ -139,4 +139,4 @@ class StoreImage(models.Model):  # remove logos with is_in_use = false after 24 
     uploaded_at = models.DateTimeField(auto_now_add=True)
     size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
 
-pre_delete.connect(store_image_pre_delete, StoreImage)
+pre_delete.connect(image_pre_delete, StoreImage)

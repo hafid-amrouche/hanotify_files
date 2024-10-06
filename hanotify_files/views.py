@@ -424,10 +424,15 @@ def delete_image(request):
         if image_url:
             try:
                 if image_type.startswith('product'):
-                    print(image_url, user_id)
                     ProductImage.objects.get(
                         user_id = user_id,
                         url=image_url
+                    ).delete()
+                
+                elif image_type == 'store/home-page/swiper-image':
+                    StoreImage.objects.filter(
+                        store__user_id = user_id,
+                        url = image_url
                     ).delete()
 
                 elif image_type == 'category':
@@ -447,6 +452,30 @@ def delete_image(request):
                     store_id = data.get('store_id')
                     store = Store.objects.get(id=store_id, user_id=user_id)
                     StoreFavicon.objects.get(store=store).delete()
+            except Exception as e:
+                print(e)
+                pass
+            return JsonResponse({
+                'detail' : 'Delete successfull'
+            }, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def delete_images(request):
+    user_data = user_from_request(request)
+    user_id = user_data['user_id']
+    
+    if request.method == 'POST' :
+        data =  json.loads(request.body)
+        images_list = data.get('images_list')
+        image_type = data.get('type')
+        if images_list:
+            try:
+                if image_type == 'store/home-page/swiper-image':
+                    StoreImage.objects.filter(
+                        store__user_id = user_id,
+                        url__in = images_list
+                    ).delete()
+                    
             except Exception as e:
                 print(e)
                 pass
@@ -759,7 +788,6 @@ def get_privacy_policy_for_edit(request):
         response = FileResponse(open(f'{settings.JSON_ROOT}/users/privacy-policy/default.json', 'rb'))
     
     return response
-
 
 def get_terms_of_service_edit(request):
     user_data = user_from_request(request)
