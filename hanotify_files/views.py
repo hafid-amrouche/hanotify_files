@@ -33,7 +33,7 @@ def make_user_directory(request):
                 
                 thank_you = {
                     'showOrderInfo': True,
-                    'thankYouText': None,
+                    'message': "",
                     'showRelatedProducts': True
                 }
 
@@ -105,7 +105,6 @@ def delete_store_directory(request):
                 print(e)
 
 def make_product_directory(request):
-    print(request.POST)
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
             try:
@@ -842,6 +841,7 @@ def upload_swiper_image(request):
             if image:
                 image_pil = IM.open(image)
                 width, height = image_pil.size
+
                 if (width > 2048 or height > 2048):
                     return JsonResponse({'error': 'Invalid request 1'}, status=400)
                 
