@@ -67,6 +67,7 @@ urlpatterns = [
     path('get-terms-of-service-for-edit', views.get_terms_of_service_edit),
     path('save-terms-of-service', views.save_terms_of_service),
     path('upload-swiper-image', views.upload_swiper_image),
+    path('save-store-images', views.save_store_images),
 ]
 
 if settings.DEBUG:

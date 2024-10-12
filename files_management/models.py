@@ -120,7 +120,7 @@ class Category(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, null=True, blank=True, related_name='categories')
     id = models.PositiveBigIntegerField(primary_key=True)
 
-class CetegoryImage(models.Model): # remove logos with category = None after 24 hours
+class CetegoryImage(models.Model): # remove if category = None after 24 hours
     store = models.ForeignKey(Store, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.OneToOneField(Category, on_delete=models.CASCADE, null=True, blank=True, related_name='image')
     url = models.TextField(null=True, blank=True)
@@ -130,7 +130,7 @@ class CetegoryImage(models.Model): # remove logos with category = None after 24 
 
 pre_delete.connect(image_pre_delete, CetegoryImage)
 
-class StoreImage(models.Model):  # remove logos with is_in_use = false after 24 hours
+class StoreImage(models.Model):  # remove if is_in_use = false after 24 hours
     store = models.ForeignKey(Store, null=True, blank=True, on_delete=models.CASCADE)
     is_in_use = models.BooleanField(default=False)
     type =  models.TextField()

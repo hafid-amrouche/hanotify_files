@@ -462,7 +462,6 @@ def delete_image(request):
 def delete_images(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
-    
     if request.method == 'POST' :
         data =  json.loads(request.body)
         images_list = data.get('images_list')
@@ -477,11 +476,12 @@ def delete_images(request):
                     
             except Exception as e:
                 print(e)
-                pass
-            return JsonResponse({
-                'detail' : 'Delete successfull'
-            }, status=200)
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+                return JsonResponse({'error': 'Invalid request'}, status=400)
+        return JsonResponse({
+            'detail' : 'Delete successfull'
+        }, status=200)
+
+   
 
 def resized_image(request):
     url = request.GET.get('url')
@@ -928,3 +928,16 @@ def get_terms_of_service(request):
         return JsonResponse({'detail': 'File not found'}, status=400)
 
 
+def save_store_images(request):
+    data = json.loads(request.POST.get('data'))
+    MESSAGING_KEY = data.get('MESSAGING_KEY')
+    if MESSAGING_KEY != settings.MESSAGING_KEY:
+        return JsonResponse({'detail': "Wrong credintials"}, status=400)
+    
+    store_id = data.get('store_id')
+    images_urls = data.get('images_urls')
+    store_images = StoreImage.objects.filter(store_id=store_id)
+    store_images.filter( url__in = images_urls).update(is_in_use=True)
+    store_images.exclude( url__in = images_urls).delete()
+
+    return JsonResponse({'detail': 'success'}, status=200)
