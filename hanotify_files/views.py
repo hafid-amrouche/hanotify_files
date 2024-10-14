@@ -104,26 +104,6 @@ def delete_store_directory(request):
             except Exception as e:
                 print(e)
 
-def make_product_directory(request):
-    if request.method == 'POST' :
-        if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
-            try:
-                product_id = request.POST.get('product_id')
-                store_id = request.POST.get('store_id')
-                user_id = request.POST.get('user_id')
-                product_path = f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}/products/{product_id}'
-                Product.objects.create(
-                    id=product_id,
-                    user_id=user_id,
-                    store_id=store_id,
-                )
-                os.makedirs(product_path, exist_ok=True)
-                return JsonResponse({'Detail': 'Path created'}, status=200)
-            except Exception as e:
-                raise
-                
-    return JsonResponse({'error': 'Request refused'}, status=405)
-
 def delete_product(request):
     if request.method == 'POST' :
         if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
@@ -593,6 +573,27 @@ def delete_category(request):
     category.delete()
     return JsonResponse({}, status=200)
 
+
+def make_product_directory(request):
+    if request.method == 'POST' :
+        if settings.MESSAGING_KEY == request.POST.get('MESSAGING_KEY'):
+            try:
+                product_id = request.POST.get('product_id')
+                store_id = request.POST.get('store_id')
+                user_id = request.POST.get('user_id')
+                product_path = f'{settings.MEDIA_ROOT}/users/{user_id}/stores/{store_id}/products/{product_id}'
+                Product.objects.create(
+                    id=product_id,
+                    user_id=user_id,
+                    store_id=store_id,
+                )
+                os.makedirs(product_path, exist_ok=True)
+                return JsonResponse({'Detail': 'Path created'}, status=200)
+            except Exception as e:
+                raise
+                
+    return JsonResponse({'error': 'Request refused'}, status=405)
+
 def get_product_for_edit(request):
     user_data = user_from_request(request)
     user_id = user_data['user_id']
@@ -602,6 +603,16 @@ def get_product_for_edit(request):
         response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
         return response
     except:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/default.json', 'rb'))
+        return response
+    
+def get_product(request):
+    product_id = request.GET.get('product_id')
+    product = Product.objects.get(id=product_id)
+    if product.active:
+        response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
+        return response
+    else:
         return JsonResponse({'detail': 'File not found'}, status=400)
     
 def save_store(request):
@@ -863,6 +874,22 @@ def upload_swiper_image(request):
                 }, status=200)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+def update_store_shipping_cost(request):
+    data = json.loads(request.POST.get('data'))
+    store_id = data.get('store_id')
+    Store.objects.get(id=store_id) 
+    
+    store_data = {
+        'defaultShippigCosts': data.get('costs_list')
+    }
+    with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'r') as json_file:
+        old_store_data = json.load(json_file)
+
+    new_store_data = {**old_store_data, **store_data}  
+    with open(settings.BASE_DIR / f'json/users/stores/{store_id}.json', 'w') as json_file:
+        json.dump(new_store_data, json_file)
+    return JsonResponse({'detail' : 'success'}, status=200)
+
 ## STORE ONLY
 
 def get_store(request):
@@ -876,14 +903,6 @@ def get_store(request):
     else:
         return JsonResponse({'detail': 'File not found'}, status=400)
     
-def get_product(request):
-    product_id = request.GET.get('product_id')
-    product = Product.objects.get(id=product_id)
-    if product.active:
-        response = FileResponse(open(f'{settings.JSON_ROOT}/users/products/{product.id}.json', 'rb'))
-        return response
-    else:
-        return JsonResponse({'detail': 'File not found'}, status=400)
 
 def get_thank_you(request):
     data = request.GET
