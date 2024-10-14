@@ -61,8 +61,12 @@ def render_product(request, slug, product_id):
         store = json.load(json_file)
     
     product_id = product_id
-    with open(settings.BASE_DIR / f'json/users/products/{product_id}.json', 'r') as json_file:
-        product = json.load(json_file)
+    try:
+        with open(settings.BASE_DIR / f'json/users/products/{product_id}.json', 'r') as json_file:
+            product = json.load(json_file)
+    
+    except:
+        return render(request, 'empty.html')
     
     return render(request, 'index.html', context={
         'store': json.dumps(store),
