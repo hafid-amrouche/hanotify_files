@@ -118,7 +118,6 @@ def delete_product(request):
                         store_id=store_id
                     ).delete()
                 except Exception as e:
-                    print(e)
                     return JsonResponse({'Detail': 'deletion unsuccessful'}, status=400)
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
