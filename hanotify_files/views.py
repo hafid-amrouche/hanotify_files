@@ -110,18 +110,19 @@ def delete_product(request):
             try:
                 product_id = request.POST.get('product_id')
                 user_id = request.POST.get('user_id')
-                store_id = request.POST.get('product_id')
+                store_id = request.POST.get('store_id')
                 try:
                     Product.objects.get(
                         id = product_id,
                         user_id = user_id,
                         store_id=store_id
                     ).delete()
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'Detail': 'deletion unsuccessful'}, status=400)
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
-                print(e)
+                return JsonResponse({'Detail': 'deletion unsuccessful 2'}, status=400)
             return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
         return JsonResponse({'Detail': 'Wrong credidentials'}, status=400)
 
