@@ -526,14 +526,20 @@ def save_category(request):
     
     store_id = data.get('store_id')
     category_image = data.get('category_image')
-    category_image = CetegoryImage.objects.get(url=category_image)
+
     category = Category.objects.create(
-        id = data.get('category_id'),
-        store_id=store_id
-    )  
-    category_image.category = category
-    category_image.save()
-    CetegoryImage.objects.filter(store_id = store_id, category=None).delete()
+            id = data.get('category_id'),
+            store_id=store_id
+        )  
+    if category_image:
+        try:
+            category_image = CetegoryImage.objects.get(url=category_image)
+            category_image.category = category
+            category_image.save()
+            CetegoryImage.objects.filter(store_id = store_id, category=None).delete()
+        except:
+            pass
+
     return JsonResponse({}, status=200)
 
 def update_category(request):
@@ -544,21 +550,30 @@ def update_category(request):
     
     store_id = data.get('store_id')
     categories_images = CetegoryImage.objects.filter(store_id = store_id)
-    category_image = data.get('category_image')
-    category_image = categories_images.get(url=category_image)
+
     category = Category.objects.get(
-        id = data.get('category_id'),
-        store_id=store_id
-    ) 
-    if category_image.category != category:
+            id = data.get('category_id'),
+            store_id=store_id
+        ) 
+    category_image = data.get('category_image')
+    if category_image:
+        category_image = categories_images.get(url=category_image)
+        
+        if category_image.category != category:
+            try:
+                category.image.delete()
+            except:
+                pass
+            category_image.category = category
+            category_image.save()
+     
+        category_image.save()
+    else:
         try:
             category.image.delete()
         except:
             pass
-        category_image.category = category
-        category_image.save()
-     
-    category_image.save()
+
     categories_images.filter(category=None).delete()
     return JsonResponse({}, status=200)
 
