@@ -117,8 +117,10 @@ def delete_product(request):
                         user_id = user_id,
                         store_id=store_id
                     ).delete()
-                except Exception as e:
-                    return JsonResponse({'Detail': 'deletion unsuccessful'}, status=400)
+                except Product.DoesNotExist:
+                    return JsonResponse({'Detail': 'Model do not exist'}, status=200)
+                except :
+                    return JsonResponse({'Detail': 'Product deleted successfully'}, status=400)
                 return JsonResponse({'Detail': 'Product deleted successfully'}, status=200)
             except Exception as e:
                 return JsonResponse({'Detail': 'deletion unsuccessful 2'}, status=400)
