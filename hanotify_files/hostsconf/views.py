@@ -29,6 +29,28 @@ def render_store(request):
         'url': request.build_absolute_uri(),
     })
 
+# delete user and delete category
+def render_category(request, str):
+    domain = request.get_host()
+    try:
+        store = Store.objects.get(domain = domain)
+    except:
+        return render(request, 'empty.html')
+    
+    with open(settings.BASE_DIR / f'json/users/stores/{store.id}.json', 'r') as json_file:
+        store = json.load(json_file)
+    
+    return render(request, 'index.html', context={
+        'store': json.dumps(store),
+        'title': store.get('name'),
+        'favicon': store.get('favicon') or "",
+        'description': store.get('description'),
+        'lang': store.get('language'),
+        'dir': 'rtl' if store.get('language') == 'ar' else 'ltr',
+        'image': store.get('logo') or "", # next will be store image
+        'url': request.build_absolute_uri(),
+    })
+    
 def render_product(request, slug, product_id):
     domain = request.get_host()
     domain = domain.replace('8080', '3001')
